@@ -1,0 +1,23 @@
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+main {
+  padding: 2rem;
+  height: calc(100vh - 4rem);
+  display: grid;
+  grid-template-rows: min-content auto;
+  gap: 1rem;
+}
+
+#start {
+  justify-self: center;
+  font-size: x-large;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+}
+
+#canvas {
+  border: 1px solid black;
+}
