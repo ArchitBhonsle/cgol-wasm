@@ -57,6 +57,12 @@ impl Canvas {
             config,
         }
     }
+    pub fn get_lengths(&self) -> (f64, f64) {
+        (self.x_length, self.y_length)
+    }
+    pub fn get_justs(&self) -> (f64, f64) {
+        (self.x_just, self.y_just)
+    }
 
     fn draw_cell(&self, x: f64, y: f64, state: bool) {
         let cell_size = self.config.cell_size;

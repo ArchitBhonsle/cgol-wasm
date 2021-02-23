@@ -32,7 +32,9 @@ features = [
   'CanvasRenderingContext2d',
   'Document',
   'Element',
+  'EventTarget',
   'HtmlCanvasElement',
+  'MouseEvent',
   'Window',
 ]
 version = "0.3.4"
