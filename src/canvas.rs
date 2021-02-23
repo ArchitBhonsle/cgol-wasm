@@ -1,21 +1,24 @@
-use crate::utils;
-
-use wasm_bindgen::prelude::*;
 use wasm_bindgen::{JsCast, JsValue};
 
+pub struct CanvasConfig {
+    pub cell_size: f64,
+    pub padding: f64,
+    pub alive_color: JsValue,
+    pub dead_color: JsValue,
+}
+
 pub struct Canvas {
+    pub canvas: web_sys::HtmlCanvasElement,
     pub ctx: web_sys::CanvasRenderingContext2d,
     pub x_length: f64,
     pub y_length: f64,
-    cell_size: f64,
-    x_just: f64,
-    y_just: f64,
-    alive_color: JsValue,
-    dead_color: JsValue,
+    pub x_just: f64,
+    pub y_just: f64,
+    pub config: CanvasConfig,
 }
 
 impl Canvas {
-    pub fn new(canvas_id: &str, cell_size: f64) -> Canvas {
+    pub fn new(canvas_id: &str, config: CanvasConfig) -> Canvas {
         let canvas: web_sys::HtmlCanvasElement = web_sys::window()
             .unwrap()
             .document()
@@ -36,6 +39,8 @@ impl Canvas {
             .dyn_into::<web_sys::CanvasRenderingContext2d>()
             .unwrap();
 
+        let cell_size = config.cell_size;
+
         let x_length = (width / cell_size).floor();
         let y_length = (height / cell_size).floor();
 
@@ -43,29 +48,30 @@ impl Canvas {
         let y_just = (height - (y_length * cell_size)) / 2.0;
 
         Canvas {
+            canvas,
             ctx,
             x_length,
             y_length,
-            cell_size,
             x_just,
             y_just,
-            alive_color: JsValue::from_str("#111111"),
-            dead_color: JsValue::from_str("#DDDDDD"),
+            config,
         }
     }
 
     fn draw_cell(&self, x: f64, y: f64, state: bool) {
-        let padding = 2.0;
+        let cell_size = self.config.cell_size;
+        let padding = self.config.padding;
+
         if state {
-            self.ctx.set_fill_style(&self.alive_color);
+            self.ctx.set_fill_style(&self.config.alive_color);
         } else {
-            self.ctx.set_fill_style(&self.dead_color);
+            self.ctx.set_fill_style(&self.config.dead_color);
         }
         self.ctx.fill_rect(
-            x * self.cell_size + padding + self.x_just,
-            y * self.cell_size + padding + self.y_just,
-            self.cell_size - 2.0 * padding,
-            self.cell_size - 2.0 * padding,
+            x * cell_size + padding + self.x_just,
+            y * cell_size + padding + self.y_just,
+            cell_size - 2.0 * padding,
+            cell_size - 2.0 * padding,
         );
     }
 

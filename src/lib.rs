@@ -1,4 +1,5 @@
 mod canvas;
+mod game;
 mod utils;
 
 use wasm_bindgen::prelude::*;
@@ -18,7 +19,5 @@ extern "C" {
 pub fn start() {
     utils::set_panic_hook();
 
-    let canvas = canvas::Canvas::new("canvas", 25.0);
-    let state_vec = vec![vec![false; canvas.x_length as usize]; canvas.y_length as usize];
-    canvas.draw(state_vec);
+    game::run("canvas", 30, 2, "#111111", "#DDDDDD");
 }
