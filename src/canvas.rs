@@ -59,9 +59,9 @@ impl Canvas {
         })
     }
 
-    pub fn get_lengths(&self) -> (f64, f64) {
-        (self.x_length, self.y_length)
-    }
+    // pub fn get_lengths(&self) -> (f64, f64) {
+    //     (self.x_length, self.y_length)
+    // }
     pub fn get_justs(&self) -> (f64, f64) {
         (self.x_just, self.y_just)
     }
