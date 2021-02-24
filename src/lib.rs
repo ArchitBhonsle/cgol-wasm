@@ -19,5 +19,10 @@ extern "C" {
 pub fn start() {
     utils::set_panic_hook();
 
-    game::run("canvas", 30, 2, "#111111", "#DDDDDD");
+    let game = game::Game::new("canvas", 30, 2, "#111111", "#DDDDDD");
+    game.attach_onclick();
+    game.tick();
+    // loop {
+    //     game.tick();
+    // }
 }

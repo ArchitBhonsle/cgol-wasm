@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use wasm_bindgen::{JsCast, JsValue};
 
 pub struct CanvasConfig {
@@ -18,7 +19,7 @@ pub struct Canvas {
 }
 
 impl Canvas {
-    pub fn new(canvas_id: &str, config: CanvasConfig) -> Canvas {
+    pub fn new(canvas_id: &str, config: CanvasConfig) -> Rc<Canvas> {
         let canvas: web_sys::HtmlCanvasElement = web_sys::window()
             .unwrap()
             .document()
@@ -47,7 +48,7 @@ impl Canvas {
         let x_just = (width - (x_length * cell_size)) / 2.0;
         let y_just = (height - (y_length * cell_size)) / 2.0;
 
-        Canvas {
+        Rc::new(Canvas {
             canvas,
             ctx,
             x_length,
@@ -55,13 +56,17 @@ impl Canvas {
             x_just,
             y_just,
             config,
-        }
+        })
     }
+
     pub fn get_lengths(&self) -> (f64, f64) {
         (self.x_length, self.y_length)
     }
     pub fn get_justs(&self) -> (f64, f64) {
         (self.x_just, self.y_just)
+    }
+    pub fn get_canvas_dims(&self) -> (f64, f64) {
+        (self.canvas.width() as f64, self.canvas.height() as f64)
     }
 
     fn draw_cell(&self, x: f64, y: f64, state: bool) {
