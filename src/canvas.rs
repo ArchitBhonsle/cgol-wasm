@@ -27,7 +27,6 @@ impl Canvas {
             .get_element_by_id(canvas_id)
             .unwrap()
             .dyn_into::<web_sys::HtmlCanvasElement>()
-            .map_err(|_| ())
             .unwrap();
 
         let height = canvas.height() as f64;

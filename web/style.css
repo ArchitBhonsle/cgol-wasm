@@ -4,14 +4,14 @@ html, body {
 }
 
 main {
-  padding: 2rem;
+  padding: 2rem 1rem;
   height: calc(100vh - 4rem);
   display: grid;
   grid-template-rows: min-content auto;
   gap: 1rem;
 }
 
-#start {
+#button {
   justify-self: center;
   font-size: x-large;
   text-transform: uppercase;

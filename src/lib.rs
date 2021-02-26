@@ -29,8 +29,8 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 pub fn start() {
     utils::set_panic_hook();
 
-    let game = game::Game::new("canvas", 30, 2, "#111111", "#DDDDDD");
-    game.attach_onclick();
+    let game = game::Game::new("canvas", "button", 30, 2, "#111111", "#DDDDDD");
+    game.attach_onclicks();
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
 
