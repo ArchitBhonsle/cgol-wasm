@@ -1,5 +1,5 @@
 use crate::canvas;
-// use crate::utils;
+use crate::utils;
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -63,7 +63,7 @@ impl Game {
             let x_offset = event.offset_x() as f64;
             let y_offset = event.offset_y() as f64;
 
-            if !paused.borrow().clone()
+            if *paused.borrow()
                 && x_offset > x_just
                 && x_offset < x_dim - x_just
                 && y_offset > y_just
@@ -85,12 +85,12 @@ impl Game {
 
     fn attach_button_onclick(&self) {
         let button = self.button.clone();
-        let button_to_canvas = self.button.clone();
+        let button_to_closure = self.button.clone();
         let paused_cell = self.paused.clone();
 
         let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
             let mut paused = paused_cell.borrow_mut();
-            button_to_canvas.set_inner_text(if *paused { "pause" } else { "play" });
+            button_to_closure.set_inner_text(if *paused { "pause" } else { "play" });
             *paused = !(*paused);
         }) as Box<dyn FnMut(_)>);
 
@@ -102,7 +102,64 @@ impl Game {
         self.attach_canvas_onclick();
         self.attach_button_onclick();
     }
-    pub fn tick(&self) {
+    pub fn draw(&self) {
         self.canvas.draw(self.state_vec.borrow().to_vec());
     }
+    pub fn tick(&self) {
+        let paused = self.paused.clone();
+
+        if !*paused.borrow() {
+            let (x_length, y_length) = self.canvas.get_lengths();
+            let current_state_vec = self.state_vec.borrow().to_vec();
+            let mut next_state_vec = vec![vec![false; x_length as usize]; y_length as usize];
+            for (y_ind, row) in current_state_vec.iter().enumerate() {
+                for (x_ind, state) in row.iter().enumerate() {
+                    let neighbours =
+                        count_neighbours(&current_state_vec, x_ind, y_ind, x_length, y_length);
+
+                    if *state && (neighbours == 2 || neighbours == 3) {
+                        next_state_vec[y_ind][x_ind] = true;
+                    } else if !*state && neighbours == 3 {
+                        next_state_vec[y_ind][x_ind] = true;
+                    }
+                }
+            }
+
+            self.state_vec.replace(next_state_vec);
+        }
+
+        self.draw()
+    }
+}
+
+fn count_neighbours(
+    state_vec: &Vec<Vec<bool>>,
+    x: usize,
+    y: usize,
+    x_length: f64,
+    y_length: f64,
+) -> u32 {
+    let mut neighbours: u32 = 0;
+    let x_diff: [i32; 3] = [1, 0, -1];
+    let y_diff: [i32; 3] = [1, 0, -1];
+    let (x, y) = (x as i32, y as i32);
+    let (x_length, y_length) = (x_length as i32, y_length as i32);
+
+    for x_n in x_diff.iter() {
+        for y_n in y_diff.iter() {
+            if *x_n == 0 && *y_n == 0 {
+                continue;
+            };
+
+            if x + x_n < 0 || x + x_n > x_length - 1 || y + y_n < 0 || y + y_n > y_length - 1 {
+                continue;
+            }
+
+            if state_vec[(y + y_n) as usize][(x + x_n) as usize] {
+                neighbours += 1;
+            }
+        }
+    }
+
+    neighbours
 }
