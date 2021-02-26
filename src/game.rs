@@ -1,5 +1,4 @@
 use crate::canvas;
-use crate::utils;
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -10,7 +9,7 @@ pub struct Game {
     canvas: Rc<canvas::Canvas>,
     button: Rc<web_sys::HtmlButtonElement>,
     state_vec: Rc<RefCell<Vec<Vec<bool>>>>,
-    paused: Rc<RefCell<bool>>,
+    pub paused: Rc<RefCell<bool>>,
 }
 
 impl Game {
@@ -102,9 +101,11 @@ impl Game {
         self.attach_canvas_onclick();
         self.attach_button_onclick();
     }
-    pub fn draw(&self) {
+
+    fn draw(&self) {
         self.canvas.draw(self.state_vec.borrow().to_vec());
     }
+
     pub fn tick(&self) {
         let paused = self.paused.clone();
 
