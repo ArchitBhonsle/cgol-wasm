@@ -29,7 +29,14 @@ impl Game {
             dead_color: JsValue::from_str(dead_color),
         };
         let canvas = canvas::Canvas::new(canvas_id, config);
-        let state_vec = vec![vec![false; canvas.x_length as usize]; canvas.y_length as usize];
+
+        let state_vec = (0..(canvas.y_length as usize))
+            .map(|_| {
+                (0..(canvas.x_length as usize))
+                    .map(|_| random_boolean())
+                    .collect()
+            })
+            .collect();
         let state_vec = Rc::new(RefCell::new(state_vec));
         let paused = Rc::new(RefCell::new(true));
 
@@ -97,7 +104,7 @@ impl Game {
             if *paused {
                 button_to_closure.set_inner_text("pause");
                 *paused = false;
-                *fps = 2.0;
+                *fps = 5.0;
             } else {
                 button_to_closure.set_inner_text("play");
                 *paused = true;
@@ -143,6 +150,10 @@ impl Game {
 
         self.draw()
     }
+}
+
+fn random_boolean() -> bool {
+    js_sys::Math::random() < 0.5
 }
 
 fn count_neighbours(
