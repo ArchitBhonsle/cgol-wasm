@@ -15,50 +15,42 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern "C" {
-    fn setInterval(closure: &Closure<dyn FnMut()>, time: u32) -> i32;
-    fn clearInterval(id: i32);
+    // js functions here
+}
 
-    fn requestAnimationFrame(closure: &Closure<dyn FnMut()>) -> u32;
-    fn cancelAnimationFrame(id: u32);
+fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+    web_sys::window()
+        .unwrap()
+        .request_animation_frame(f.as_ref().unchecked_ref())
+        .unwrap();
 }
 
 #[wasm_bindgen(start)]
-pub fn start() {
+pub fn start() -> Result<(), JsValue> {
     utils::set_panic_hook();
 
     let game = game::Game::new("canvas", "button", 30, 2, "#333", "#DDD");
     game.attach_onclicks();
 
+    let fps_cell = game.fps.clone();
+    let mut previous: f64 = js_sys::Date::now();
+
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
-
-    let interval_id = Rc::new(RefCell::new(None));
-    let frame_id = Rc::new(RefCell::new(None));
-
-    let interval_id_cell = interval_id.clone();
-    let frame_id_cell = frame_id.clone();
-
     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        game.tick();
-        // utils::log(&format!("{}", game.paused.borrow().clone()));
-        if game.paused.borrow().clone() {
-            frame_id_cell
-                .borrow_mut()
-                .replace(requestAnimationFrame(f.borrow().as_ref().unwrap()));
-            match interval_id_cell.borrow().clone() {
-                Some(x) => clearInterval(x),
-                None => {}
-            }
-        } else {
-            interval_id_cell.replace(Some(setInterval(f.borrow().as_ref().unwrap(), 1000)));
-            match frame_id_cell.borrow().clone() {
-                Some(x) => cancelAnimationFrame(x),
-                None => {}
-            }
+        request_animation_frame(f.borrow().as_ref().unwrap());
+
+        let fps = fps_cell.borrow();
+        let now = js_sys::Date::now();
+        if now < previous + (1000.0 / *fps) {
+            return ();
         }
+        previous = now;
+
+        game.tick();
     }) as Box<dyn FnMut()>));
 
-    frame_id
-        .borrow_mut()
-        .replace(requestAnimationFrame(g.borrow().as_ref().unwrap()));
+    request_animation_frame(g.borrow().as_ref().unwrap());
+
+    Ok(())
 }

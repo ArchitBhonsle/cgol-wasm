@@ -9,7 +9,8 @@ pub struct Game {
     canvas: Rc<canvas::Canvas>,
     button: Rc<web_sys::HtmlButtonElement>,
     state_vec: Rc<RefCell<Vec<Vec<bool>>>>,
-    pub paused: Rc<RefCell<bool>>,
+    paused: Rc<RefCell<bool>>,
+    pub fps: Rc<RefCell<f64>>,
 }
 
 impl Game {
@@ -41,12 +42,14 @@ impl Game {
             .dyn_into::<web_sys::HtmlButtonElement>()
             .unwrap();
         let button = Rc::new(button);
+        let fps = Rc::new(RefCell::new(60.0));
 
         Game {
             canvas,
             button,
             state_vec,
             paused,
+            fps,
         }
     }
 
@@ -86,11 +89,20 @@ impl Game {
         let button = self.button.clone();
         let button_to_closure = self.button.clone();
         let paused_cell = self.paused.clone();
+        let fps_cell = self.fps.clone();
 
         let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
             let mut paused = paused_cell.borrow_mut();
-            button_to_closure.set_inner_text(if *paused { "pause" } else { "play" });
-            *paused = !(*paused);
+            let mut fps = fps_cell.borrow_mut();
+            if *paused {
+                button_to_closure.set_inner_text("pause");
+                *paused = false;
+                *fps = 2.0;
+            } else {
+                button_to_closure.set_inner_text("play");
+                *paused = true;
+                *fps = 60.0;
+            }
         }) as Box<dyn FnMut(_)>);
 
         button.set_onclick(Some(closure.as_ref().unchecked_ref()));
