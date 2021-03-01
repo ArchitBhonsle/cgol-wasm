@@ -3,7 +3,7 @@ use crate::canvas;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::{JsCast, JsValue};
+use wasm_bindgen::JsCast;
 
 pub struct Game {
     canvas: Rc<canvas::Canvas>,
@@ -21,16 +21,8 @@ impl Game {
         slider_id: &str,
         cell_size: u32,
         padding: u32,
-        alive_color: &str,
-        dead_color: &str,
     ) -> Game {
-        let config = canvas::CanvasConfig {
-            cell_size: cell_size as f64,
-            padding: padding as f64,
-            alive_color: JsValue::from_str(alive_color),
-            dead_color: JsValue::from_str(dead_color),
-        };
-        let canvas = canvas::Canvas::new(canvas_id, config);
+        let canvas = canvas::Canvas::new(canvas_id, padding as f64, cell_size as f64);
 
         let state_vec = (0..(canvas.y_length as usize))
             .map(|_| {
@@ -80,7 +72,7 @@ impl Game {
         let canvas = self.canvas.clone();
         let (x_just, y_just) = canvas.get_justs();
         let (x_dim, y_dim) = canvas.get_canvas_dims();
-        let cell_size = canvas.config.cell_size;
+        let cell_size = canvas.cell_size;
 
         let closure = Closure::wrap(Box::new(move |event: web_sys::MouseEvent| {
             let x_offset = event.offset_x() as f64;

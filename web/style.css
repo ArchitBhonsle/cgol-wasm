@@ -2,6 +2,7 @@ html, body {
   margin: 0;
   height: 100%;
   font-family: sans-serif;
+  background-color: black;
 }
 
 main {
@@ -26,4 +27,8 @@ main {
   align-items: center;
   justify-content: center;
   gap: 1rem
+}
+
+#canvas {
+  background: linear-gradient(to right, #8a2387, #e94057, #f27121);
 }

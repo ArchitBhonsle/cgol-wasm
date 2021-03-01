@@ -32,20 +32,9 @@ pub fn start(
     slider_id: &str,
     cell_size: u32,
     padding: u32,
-    alive_color: &str,
-    dead_color: &str,
 ) -> Result<(), JsValue> {
     utils::set_panic_hook();
-
-    let game = game::Game::new(
-        canvas_id,
-        button_id,
-        slider_id,
-        cell_size,
-        padding,
-        alive_color,
-        dead_color,
-    );
+    let game = game::Game::new(canvas_id, button_id, slider_id, cell_size, padding);
     game.attach_listeners();
 
     let fps_cell = game.fps.clone();

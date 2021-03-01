@@ -1,13 +1,6 @@
 use std::rc::Rc;
 use wasm_bindgen::{JsCast, JsValue};
 
-pub struct CanvasConfig {
-    pub cell_size: f64,
-    pub padding: f64,
-    pub alive_color: JsValue,
-    pub dead_color: JsValue,
-}
-
 pub struct Canvas {
     pub canvas: web_sys::HtmlCanvasElement,
     pub ctx: web_sys::CanvasRenderingContext2d,
@@ -15,11 +8,12 @@ pub struct Canvas {
     pub y_length: f64,
     pub x_just: f64,
     pub y_just: f64,
-    pub config: CanvasConfig,
+    pub cell_size: f64,
+    pub padding: f64,
 }
 
 impl Canvas {
-    pub fn new(canvas_id: &str, config: CanvasConfig) -> Rc<Canvas> {
+    pub fn new(canvas_id: &str, padding: f64, cell_size: f64) -> Rc<Canvas> {
         let canvas: web_sys::HtmlCanvasElement = web_sys::window()
             .unwrap()
             .document()
@@ -39,7 +33,11 @@ impl Canvas {
             .dyn_into::<web_sys::CanvasRenderingContext2d>()
             .unwrap();
 
-        let cell_size = config.cell_size;
+        ctx.set_fill_style(&JsValue::from_str("#000"));
+        ctx.fill_rect(0.0, 0.0, width, height);
+
+        let cell_size = cell_size;
+        let padding = padding;
 
         let x_length = (width / cell_size).floor();
         let y_length = (height / cell_size).floor();
@@ -54,7 +52,8 @@ impl Canvas {
             y_length,
             x_just,
             y_just,
-            config,
+            cell_size,
+            padding,
         })
     }
 
@@ -69,20 +68,25 @@ impl Canvas {
     }
 
     fn draw_cell(&self, x: f64, y: f64, state: bool) {
-        let cell_size = self.config.cell_size;
-        let padding = self.config.padding;
+        let cell_size = self.cell_size;
+        let padding = self.padding;
 
         if state {
-            self.ctx.set_fill_style(&self.config.alive_color);
+            self.ctx.clear_rect(
+                x * cell_size + padding + self.x_just,
+                y * cell_size + padding + self.y_just,
+                cell_size - 2.0 * padding,
+                cell_size - 2.0 * padding,
+            );
         } else {
-            self.ctx.set_fill_style(&self.config.dead_color);
+            self.ctx.set_fill_style(&JsValue::from_str("#000"));
+            self.ctx.fill_rect(
+                x * cell_size + padding + self.x_just,
+                y * cell_size + padding + self.y_just,
+                cell_size - 2.0 * padding,
+                cell_size - 2.0 * padding,
+            );
         }
-        self.ctx.fill_rect(
-            x * cell_size + padding + self.x_just,
-            y * cell_size + padding + self.y_just,
-            cell_size - 2.0 * padding,
-            cell_size - 2.0 * padding,
-        );
     }
 
     pub fn draw(&self, state_vec: Vec<Vec<bool>>) {
