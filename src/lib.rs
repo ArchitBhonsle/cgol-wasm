@@ -25,11 +25,27 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
         .unwrap();
 }
 
-#[wasm_bindgen(start)]
-pub fn start() -> Result<(), JsValue> {
+#[wasm_bindgen()]
+pub fn start(
+    canvas_id: &str,
+    button_id: &str,
+    slider_id: &str,
+    cell_size: u32,
+    padding: u32,
+    alive_color: &str,
+    dead_color: &str,
+) -> Result<(), JsValue> {
     utils::set_panic_hook();
 
-    let game = game::Game::new("canvas", "button", "fps-slider", 30, 2, "#333", "#DDD");
+    let game = game::Game::new(
+        canvas_id,
+        button_id,
+        slider_id,
+        cell_size,
+        padding,
+        alive_color,
+        dead_color,
+    );
     game.attach_listeners();
 
     let fps_cell = game.fps.clone();
