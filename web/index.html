@@ -7,11 +7,18 @@
   <title>Game of Life</title>
 
   <link rel="stylesheet" href="style.css">
-  <script src="index.js" type="module" defer></script>
+  <script src="wasm.js" type="module" defer></script>
+  <script src="misc.js" defer></script>
 </head>
 <body>
   <main>
-    <button id="button">start!</button>
+    <div id="controls">
+      <button id="button">▶</button>
+      <div id="fps">
+        <input type="range" id="fps-slider" min="1" max="120" value="5">
+        <span id="fps-value">5 fps</span>
+      </div>
+    </div>
     <canvas id="canvas"></canvas>
     <script>
       const canvas = document.getElementById('canvas');

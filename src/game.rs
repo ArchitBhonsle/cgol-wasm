@@ -8,6 +8,7 @@ use wasm_bindgen::{JsCast, JsValue};
 pub struct Game {
     canvas: Rc<canvas::Canvas>,
     button: Rc<web_sys::HtmlButtonElement>,
+    slider: Rc<web_sys::HtmlInputElement>,
     state_vec: Rc<RefCell<Vec<Vec<bool>>>>,
     paused: Rc<RefCell<bool>>,
     pub fps: Rc<RefCell<f64>>,
@@ -17,6 +18,7 @@ impl Game {
     pub fn new(
         canvas_id: &str,
         button_id: &str,
+        slider_id: &str,
         cell_size: u32,
         padding: u32,
         alive_color: &str,
@@ -49,11 +51,23 @@ impl Game {
             .dyn_into::<web_sys::HtmlButtonElement>()
             .unwrap();
         let button = Rc::new(button);
+
+        let slider = web_sys::window()
+            .unwrap()
+            .document()
+            .unwrap()
+            .get_element_by_id(slider_id)
+            .unwrap()
+            .dyn_into::<web_sys::HtmlInputElement>()
+            .unwrap();
+        let slider = Rc::new(slider);
+
         let fps = Rc::new(RefCell::new(60.0));
 
         Game {
             canvas,
             button,
+            slider,
             state_vec,
             paused,
             fps,
@@ -71,8 +85,9 @@ impl Game {
         let closure = Closure::wrap(Box::new(move |event: web_sys::MouseEvent| {
             let x_offset = event.offset_x() as f64;
             let y_offset = event.offset_y() as f64;
+            let paused_state = *(*paused).borrow();
 
-            if *paused.borrow()
+            if paused_state
                 && x_offset > x_just
                 && x_offset < x_dim - x_just
                 && y_offset > y_just
@@ -95,18 +110,20 @@ impl Game {
     fn attach_button_onclick(&self) {
         let button = self.button.clone();
         let button_to_closure = self.button.clone();
+        let slider_to_closure = self.slider.clone();
         let paused_cell = self.paused.clone();
         let fps_cell = self.fps.clone();
 
         let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
             let mut paused = paused_cell.borrow_mut();
             let mut fps = fps_cell.borrow_mut();
+            let slider_value: f64 = slider_to_closure.value_as_number();
             if *paused {
-                button_to_closure.set_inner_text("pause");
+                button_to_closure.set_inner_text("⏸");
                 *paused = false;
-                *fps = 5.0;
+                *fps = slider_value;
             } else {
-                button_to_closure.set_inner_text("play");
+                button_to_closure.set_inner_text("▶");
                 *paused = true;
                 *fps = 60.0;
             }
@@ -116,21 +133,39 @@ impl Game {
         closure.forget();
     }
 
-    pub fn attach_onclicks(&self) {
+    fn attach_slider_watch(&self) {
+        let slider = self.slider.clone();
+        let slider_to_closure = self.slider.clone();
+        let fps_cell = self.fps.clone();
+
+        let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
+            let mut fps = fps_cell.borrow_mut();
+            let slider_value: f64 = slider_to_closure.value_as_number();
+            *fps = slider_value;
+        }) as Box<dyn FnMut(_)>);
+
+        slider.set_onclick(Some(closure.as_ref().unchecked_ref()));
+        closure.forget();
+    }
+
+    pub fn attach_listeners(&self) {
         self.attach_canvas_onclick();
         self.attach_button_onclick();
+        self.attach_slider_watch();
     }
 
     fn draw(&self) {
-        self.canvas.draw(self.state_vec.borrow().to_vec());
+        let state_vec = (*self.state_vec).borrow().to_vec();
+        self.canvas.draw(state_vec);
     }
 
     pub fn tick(&self) {
-        let paused = self.paused.clone();
+        let paused_cell = self.paused.clone();
+        let paused_state = *(*paused_cell).borrow();
 
-        if !*paused.borrow() {
+        if !paused_state {
             let (x_length, y_length) = self.canvas.get_lengths();
-            let current_state_vec = self.state_vec.borrow().to_vec();
+            let current_state_vec = (*self.state_vec).borrow().to_vec();
             let mut next_state_vec = vec![vec![false; x_length as usize]; y_length as usize];
             for (y_ind, row) in current_state_vec.iter().enumerate() {
                 for (x_ind, state) in row.iter().enumerate() {

@@ -1,6 +1,7 @@
 html, body {
   margin: 0;
   height: 100%;
+  font-family: sans-serif;
 }
 
 main {
@@ -13,11 +14,16 @@ main {
 
 #button {
   justify-self: center;
-  font-size: x-large;
-  text-transform: uppercase;
-  padding: 1rem 2rem;
+  height: 3rem;
+  width: 3rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 100rem;
 }
 
-#canvas {
-  border: 1px solid black;
+#controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem
 }

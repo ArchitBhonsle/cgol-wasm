@@ -29,11 +29,11 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 pub fn start() -> Result<(), JsValue> {
     utils::set_panic_hook();
 
-    let game = game::Game::new("canvas", "button", 30, 2, "#333", "#DDD");
-    game.attach_onclicks();
+    let game = game::Game::new("canvas", "button", "fps-slider", 30, 2, "#333", "#DDD");
+    game.attach_listeners();
 
     let fps_cell = game.fps.clone();
-    let mut previous: f64 = js_sys::Date::now();
+    let mut previous = js_sys::Date::now();
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();
