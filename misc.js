@@ -1,6 +1,5 @@
-const fps_slider = document.getElementById('fps-slider');
-const fps_value = document.getElementById('fps-value');
-
-fps.addEventListener('change', e => {
-  fps_value.innerHTML = `${e.target.value} fps`;
-});
+const canvas = document.getElementById('canvas');
+canvas.style.width = '100%';
+canvas.style.height = '100%';
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
