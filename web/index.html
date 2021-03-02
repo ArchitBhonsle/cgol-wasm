@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+  <link rel="manifest" href="favicons/site.webmanifest">
   <title>Game of Life</title>
 
   <link rel="stylesheet" href="style.css">
@@ -13,20 +17,16 @@
 <body>
   <main>
     <div id="controls">
-      <button id="button">▶</button>
+      <button id="pause-play" class="button-styles">▶</button>
+      <button id="randomize" class="button-styles">↻</button>
+      <button id="clear" class="button-styles">✕</button>
       <div id="fps">
-        <input type="range" id="fps-slider" min="1" max="120" value="5">
-        <span id="fps-value">5 fps</span>
+        <input id="fps-input" type="number" min="1" max="120" value="30" step="1">
+        <span id="fps-label">fps</span>
       </div>
+      <button id="help" class="button-styles">?</button>
     </div>
     <canvas id="canvas"></canvas>
-    <script>
-      const canvas = document.getElementById('canvas');
-      canvas.style.width ='100%';
-      canvas.style.height='100%';
-      canvas.width  = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    </script>
   </main>
 </body>
 </html>

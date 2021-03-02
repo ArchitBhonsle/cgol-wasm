@@ -1,7 +1,12 @@
+:root {
+  --grad: linear-gradient(90deg, #FC466B 0%, #3F5EFB 100%);
+}
+
 html, body {
   margin: 0;
   height: 100%;
   font-family: sans-serif;
+  color: white;
   background-color: black;
 }
 
@@ -13,22 +18,46 @@ main {
   gap: 1rem;
 }
 
-#button {
-  justify-self: center;
-  height: 3rem;
-  width: 3rem;
-  border: none;
-  cursor: pointer;
-  border-radius: 100rem;
-}
-
 #controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem
+  gap: 1rem;
+  background: var(--grad) border-box, transparent content-box;
+  background-clip: border-box;
+  -webkit-background-clip: text;
+}
+
+.button-styles {
+  height: 2rem;
+  width: 2rem;
+  font-size: large;
+  font-weight: bold;
+  justify-self: center;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+#fps-input {
+  font-size: large;
+  font-weight: bold;
+  -webkit-text-fill-color: transparent;
+  background-color: transparent;
+  border: none;
+}
+
+#fps-label {
+  font-size: large;
+  font-weight: bold;
+  -webkit-text-fill-color: transparent;
+}
+
+#help {
+  margin-left: auto;
 }
 
 #canvas {
-  background: linear-gradient(to right, #8a2387, #e94057, #f27121);
+  background: var(--grad);
 }

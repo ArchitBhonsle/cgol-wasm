@@ -29,12 +29,22 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
 pub fn start(
     canvas_id: &str,
     button_id: &str,
-    slider_id: &str,
+    fps_input_id: &str,
+    randomize_id: &str,
+    clear_id: &str,
     cell_size: u32,
     padding: u32,
 ) -> Result<(), JsValue> {
     utils::set_panic_hook();
-    let game = game::Game::new(canvas_id, button_id, slider_id, cell_size, padding);
+    let game = game::Game::new(
+        canvas_id,
+        button_id,
+        fps_input_id,
+        randomize_id,
+        clear_id,
+        cell_size,
+        padding,
+    );
     game.attach_listeners();
 
     let fps_cell = game.fps.clone();

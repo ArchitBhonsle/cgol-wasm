@@ -7,8 +7,10 @@ use wasm_bindgen::JsCast;
 
 pub struct Game {
     canvas: Rc<canvas::Canvas>,
-    button: Rc<web_sys::HtmlButtonElement>,
-    slider: Rc<web_sys::HtmlInputElement>,
+    pause_play: Rc<web_sys::HtmlButtonElement>,
+    randomize: Rc<web_sys::HtmlButtonElement>,
+    clear: Rc<web_sys::HtmlButtonElement>,
+    fps_input: Rc<web_sys::HtmlInputElement>,
     state_vec: Rc<RefCell<Vec<Vec<bool>>>>,
     paused: Rc<RefCell<bool>>,
     pub fps: Rc<RefCell<f64>>,
@@ -18,7 +20,9 @@ impl Game {
     pub fn new(
         canvas_id: &str,
         button_id: &str,
-        slider_id: &str,
+        fps_input_id: &str,
+        randomize_id: &str,
+        clear_id: &str,
         cell_size: u32,
         padding: u32,
     ) -> Game {
@@ -34,7 +38,7 @@ impl Game {
         let state_vec = Rc::new(RefCell::new(state_vec));
         let paused = Rc::new(RefCell::new(true));
 
-        let button = web_sys::window()
+        let pause_play = web_sys::window()
             .unwrap()
             .document()
             .unwrap()
@@ -42,24 +46,46 @@ impl Game {
             .unwrap()
             .dyn_into::<web_sys::HtmlButtonElement>()
             .unwrap();
-        let button = Rc::new(button);
+        let pause_play = Rc::new(pause_play);
 
-        let slider = web_sys::window()
+        let randomize = web_sys::window()
             .unwrap()
             .document()
             .unwrap()
-            .get_element_by_id(slider_id)
+            .get_element_by_id(randomize_id)
+            .unwrap()
+            .dyn_into::<web_sys::HtmlButtonElement>()
+            .unwrap();
+        let randomize = Rc::new(randomize);
+
+        let clear = web_sys::window()
+            .unwrap()
+            .document()
+            .unwrap()
+            .get_element_by_id(clear_id)
+            .unwrap()
+            .dyn_into::<web_sys::HtmlButtonElement>()
+            .unwrap();
+        let clear = Rc::new(clear);
+
+        let fps_input = web_sys::window()
+            .unwrap()
+            .document()
+            .unwrap()
+            .get_element_by_id(fps_input_id)
             .unwrap()
             .dyn_into::<web_sys::HtmlInputElement>()
             .unwrap();
-        let slider = Rc::new(slider);
+        let fps_input = Rc::new(fps_input);
 
         let fps = Rc::new(RefCell::new(60.0));
 
         Game {
             canvas,
-            button,
-            slider,
+            pause_play,
+            randomize,
+            clear,
+            fps_input,
             state_vec,
             paused,
             fps,
@@ -67,7 +93,6 @@ impl Game {
     }
 
     fn attach_canvas_onclick(&self) {
-        let paused = self.paused.clone();
         let state_vec_cell = self.state_vec.clone();
         let canvas = self.canvas.clone();
         let (x_just, y_just) = canvas.get_justs();
@@ -77,10 +102,8 @@ impl Game {
         let closure = Closure::wrap(Box::new(move |event: web_sys::MouseEvent| {
             let x_offset = event.offset_x() as f64;
             let y_offset = event.offset_y() as f64;
-            let paused_state = *(*paused).borrow();
 
-            if paused_state
-                && x_offset > x_just
+            if x_offset > x_just
                 && x_offset < x_dim - x_just
                 && y_offset > y_just
                 && y_offset < y_dim - y_just
@@ -99,21 +122,21 @@ impl Game {
         closure.forget();
     }
 
-    fn attach_button_onclick(&self) {
-        let button = self.button.clone();
-        let button_to_closure = self.button.clone();
-        let slider_to_closure = self.slider.clone();
+    fn attach_pause_play_onclick(&self) {
+        let button = self.pause_play.clone();
+        let button_to_closure = self.pause_play.clone();
+        let fps_input_to_closure = self.fps_input.clone();
         let paused_cell = self.paused.clone();
         let fps_cell = self.fps.clone();
 
         let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
             let mut paused = paused_cell.borrow_mut();
             let mut fps = fps_cell.borrow_mut();
-            let slider_value: f64 = slider_to_closure.value_as_number();
+            let fps_input_value: f64 = fps_input_to_closure.value_as_number();
             if *paused {
                 button_to_closure.set_inner_text("⏸");
                 *paused = false;
-                *fps = slider_value;
+                *fps = fps_input_value;
             } else {
                 button_to_closure.set_inner_text("▶");
                 *paused = true;
@@ -125,25 +148,64 @@ impl Game {
         closure.forget();
     }
 
-    fn attach_slider_watch(&self) {
-        let slider = self.slider.clone();
-        let slider_to_closure = self.slider.clone();
+    fn attach_randomize_onclick(&self) {
+        let state_vec_cell = self.state_vec.clone();
+        let (x_length, y_length) = self.canvas.get_lengths();
+
+        let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
+            let mut state_vec = state_vec_cell.borrow_mut();
+            *state_vec = (0..(y_length as usize))
+                .map(|_| (0..(x_length as usize)).map(|_| random_boolean()).collect())
+                .collect();
+        }) as Box<dyn FnMut(_)>);
+
+        self.randomize
+            .set_onclick(Some(closure.as_ref().unchecked_ref()));
+        closure.forget();
+    }
+
+    fn attach_clear_onclick(&self) {
+        let state_vec_cell = self.state_vec.clone();
+        let (x_length, y_length) = self.canvas.get_lengths();
+
+        let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
+            let mut state_vec = state_vec_cell.borrow_mut();
+            *state_vec = vec![vec![false; x_length as usize]; y_length as usize];
+        }) as Box<dyn FnMut(_)>);
+
+        self.clear
+            .set_onclick(Some(closure.as_ref().unchecked_ref()));
+        closure.forget();
+    }
+
+    fn attach_fps_input_watch(&self) {
+        let fps_input = self.fps_input.clone();
+        let fps_input_to_closure = self.fps_input.clone();
         let fps_cell = self.fps.clone();
 
         let closure = Closure::wrap(Box::new(move |_event: web_sys::MouseEvent| {
             let mut fps = fps_cell.borrow_mut();
-            let slider_value: f64 = slider_to_closure.value_as_number();
-            *fps = slider_value;
+            let mut fps_input_value: f64 = fps_input_to_closure.value_as_number();
+            if fps_input_value < 1.0 {
+                fps_input_value = 1.0
+            }
+            if fps_input_value > 120.0 {
+                fps_input_value = 120.0
+            }
+            fps_input_to_closure.set_value_as_number(fps_input_value);
+            *fps = fps_input_value;
         }) as Box<dyn FnMut(_)>);
 
-        slider.set_onclick(Some(closure.as_ref().unchecked_ref()));
+        fps_input.set_onchange(Some(closure.as_ref().unchecked_ref()));
         closure.forget();
     }
 
     pub fn attach_listeners(&self) {
         self.attach_canvas_onclick();
-        self.attach_button_onclick();
-        self.attach_slider_watch();
+        self.attach_pause_play_onclick();
+        self.attach_randomize_onclick();
+        self.attach_clear_onclick();
+        self.attach_fps_input_watch();
     }
 
     fn draw(&self) {
