@@ -41,15 +41,16 @@ main {
   -webkit-text-fill-color: transparent;
 }
 
-#fps-input {
+.number-input {
   font-size: large;
   font-weight: bold;
+  width: auto;
   -webkit-text-fill-color: transparent;
   background-color: transparent;
   border: none;
 }
 
-#fps-label {
+.number-label {
   font-size: large;
   font-weight: bold;
   -webkit-text-fill-color: transparent;
