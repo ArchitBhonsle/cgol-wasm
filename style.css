@@ -1,5 +1,6 @@
 :root {
   --grad: linear-gradient(90deg, #FC466B 0%, #3F5EFB 100%);
+  --rev-grad: linear-gradient(90deg, #3F5EFB 0%, #FC466B 100%);
 }
 
 html, body {
@@ -24,7 +25,7 @@ main {
   justify-content: center;
   gap: 1rem;
   background: var(--grad) border-box, transparent content-box;
-  background-clip: border-box;
+  background-clip: text;
   -webkit-background-clip: text;
 }
 
@@ -60,4 +61,57 @@ main {
 
 #canvas {
   background: var(--grad);
+}
+
+#modal-container {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 600px;
+  overflow: auto;
+  background-color: black;
+}
+
+#modal {
+  padding: 1rem;
+  margin: 1rem;
+  border: 5px solid;
+  border-image-slice: 1;
+  border-image-source: var(--rev-grad);
+  background: var(--rev-grad); 
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+#modal-close {
+  font-size: 1rem;
+  /* -webkit-text-fill-color: transparent; */
+  cursor: pointer;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+#modal h3 {
+  -webkit-text-fill-color: transparent;
+  margin: 0.25rem 0;
+  text-align: center;
+}
+
+#modal hr {
+  height: 0.1rem;
+  border: 0;
+  background: var(--rev-grad);
+}
+
+#modal ul {
+  padding-left: 1rem;
+  color: rgb(180, 180, 180);
+}
+#modal ul li {
+  margin-bottom: 0.5rem;
 }
