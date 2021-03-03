@@ -15,10 +15,41 @@
   <script src="misc.js" defer></script>
 </head>
 <body>
+  <div id="modal-container">
+    <div id="modal">
+      <span id="modal-close">✕</span>
+      <h3>Rules</h3>
+      <hr>
+      <ul>
+        <li>Any live cell with fewer than two live neighbours dies, as if by underpopulation.</li>
+        <li>Any live cell with two or three live neighbours lives on to the next generation.</li>
+        <li>Any live cell with more than three live neighbours dies, as if by overpopulation.</li>
+        <li>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</li>
+      </ul>
+      <h3>Controls</h3>
+      <hr>
+      <ul>
+        <li>Click on any of the cells to toggle them alive or dead.</li>
+        <li>Click ▶ to start the simulation and ⏸ to pause it.</li>
+        <li>⟳ will randomize the board and ✕ will clear the whole board.</li>
+        <li>In the fps input you can enter values between 1 and 120 and that will set the fps.</li>
+      </ul>
+      <h3>Keyboard Shortcuts</h3>
+      <hr>
+      <ul>
+        <li><kbd>space</kbd> to play/pause</li>
+        <li><kbd>enter</kbd> to randomize</li>
+        <li><kbd>backspace</kbd> to clear</li>
+        <li><kbd>⌃</kbd> / <kbd>⌄</kbd> to increase/decrease fps</li>
+        <li><kbd>?</kbd> to open this modal</li>
+      </ul>
+    </div>
+  </div>
+
   <main>
     <div id="controls">
       <button id="pause-play" class="button-styles">▶</button>
-      <button id="randomize" class="button-styles">↻</button>
+      <button id="randomize" class="button-styles">⟳</button>
       <button id="clear" class="button-styles">✕</button>
       <div id="fps">
         <input id="fps-input" type="number" min="1" max="120" value="30" step="1">
