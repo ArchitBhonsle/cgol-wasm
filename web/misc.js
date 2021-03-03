@@ -51,9 +51,9 @@ const modalContainer = document.getElementById('modal-container');
 const modal = document.getElementById('modal');
 const modalClose = document.getElementById('modal-close');
 
-const visitedBefore = localStorage.getItem('cgol-wasm');
-if (visitedBefore) modalContainer.style.display = 'none';
-else localStorage.setItem('cgol-wasm', 'meow');
+// const visitedBefore = localStorage.getItem('cgol-wasm');
+// if (visitedBefore) modalContainer.style.display = 'none';
+// else localStorage.setItem('cgol-wasm', 'meow');
 
 help.onclick = function () {
   modalContainer.style.display =
