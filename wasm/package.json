@@ -1,0 +1,21 @@
+{
+  "name": "cgol-wasm",
+  "collaborators": [
+    "Archit Bhonsle <abhonsle2000@gmail.com>"
+  ],
+  "description": "Conway's Game of Life in the browser using WebAssembly",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArchitBhonsle/cgol-wasm.git"
+  },
+  "files": [
+    "cgol_bg.wasm",
+    "cgol.js",
+    "cgol.d.ts"
+  ],
+  "module": "cgol.js",
+  "types": "cgol.d.ts",
+  "sideEffects": false
+}
