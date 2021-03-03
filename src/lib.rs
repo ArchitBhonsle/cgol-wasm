@@ -25,7 +25,7 @@ fn request_animation_frame(f: &Closure<dyn FnMut()>) {
         .unwrap();
 }
 
-#[wasm_bindgen()]
+#[wasm_bindgen]
 pub fn start(
     canvas_id: &str,
     button_id: &str,

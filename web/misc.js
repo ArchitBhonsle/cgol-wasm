@@ -18,13 +18,13 @@ window.addEventListener(
     if (event.defaultPrevented) return;
 
     switch (event.key) {
-      case ' ':
+      case 'p':
         pausePlay.click();
         break;
-      case 'Enter':
+      case 'r':
         randomize.click();
         break;
-      case 'Backspace':
+      case 'c':
         clear.click();
         break;
       case 'ArrowUp':
@@ -50,6 +50,10 @@ window.addEventListener(
 const modalContainer = document.getElementById('modal-container');
 const modal = document.getElementById('modal');
 const modalClose = document.getElementById('modal-close');
+
+const visitedBefore = localStorage.getItem('cgol-wasm');
+if (visitedBefore) modalContainer.style.display = 'none';
+else localStorage.setItem('cgol-wasm', 'meow');
 
 help.onclick = function () {
   modalContainer.style.display =
